@@ -1,4 +1,4 @@
-/* commonmark 0.30.1-2 https://github.com/commonmark/commonmark.js @license BSD3 */
+/* commonmark 0.31.2-0 https://github.com/commonmark/commonmark.js @license BSD3 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -87,8 +87,6 @@
         this._prev = null;
         this._next = null;
         this._sourcepos = sourcepos;
-        this._lastLineBlank = false;
-        this._lastLineChecked = false;
         this._open = true;
         this._string_content = null;
         this._literal = null;
@@ -7573,9 +7571,9 @@
     var ATTRIBUTE = "(?:" + "\\s+" + ATTRIBUTENAME + ATTRIBUTEVALUESPEC + "?)";
     var OPENTAG = "<" + TAGNAME + ATTRIBUTE + "*" + "\\s*/?>";
     var CLOSETAG = "</" + TAGNAME + "\\s*[>]";
-    var HTMLCOMMENT = "<!---->|<!--(?:-?[^>-])(?:-?[^-])*-->";
+    var HTMLCOMMENT = "<!-->|<!--->|<!--[\\s\\S]*?-->";
     var PROCESSINGINSTRUCTION = "[<][?][\\s\\S]*?[?][>]";
-    var DECLARATION = "<![A-Z]+" + "\\s+[^>]*>";
+    var DECLARATION = "<![A-Za-z]+" + "[^>]*>";
     var CDATA = "<!\\[CDATA\\[[\\s\\S]*?\\]\\]>";
     var HTMLTAG =
         "(?:" +
@@ -7607,7 +7605,7 @@
         if (s.charCodeAt(0) === C_BACKSLASH) {
             return s.charAt(1);
         } else {
-            return lib_7(s);
+            return lib_6(s);
         }
     };
 
@@ -12677,23 +12675,25 @@
     var reHtmlTag$1 = reHtmlTag;
 
     var rePunctuation = new RegExp(
-        /^[!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~\xA1\xA7\xAB\xB6\xB7\xBB\xBF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u0AF0\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166D\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E42\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]|\uD800[\uDD00-\uDD02\uDF9F\uDFD0]|\uD801\uDD6F|\uD802[\uDC57\uDD1F\uDD3F\uDE50-\uDE58\uDE7F\uDEF0-\uDEF6\uDF39-\uDF3F\uDF99-\uDF9C]|\uD804[\uDC47-\uDC4D\uDCBB\uDCBC\uDCBE-\uDCC1\uDD40-\uDD43\uDD74\uDD75\uDDC5-\uDDC9\uDDCD\uDDDB\uDDDD-\uDDDF\uDE38-\uDE3D\uDEA9]|\uD805[\uDCC6\uDDC1-\uDDD7\uDE41-\uDE43\uDF3C-\uDF3E]|\uD809[\uDC70-\uDC74]|\uD81A[\uDE6E\uDE6F\uDEF5\uDF37-\uDF3B\uDF44]|\uD82F\uDC9F|\uD836[\uDE87-\uDE8B]/
-    );
+        /^[!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~\p{P}\p{S}]/u);
 
     var reLinkSize = /^=(\d*)(?:x(\d*))?/;
 
     var reLinkTitle = new RegExp(
         '^(?:"(' +
-            ESCAPED_CHAR +
-            '|[^"\\x00])*"' +
-            "|" +
-            "'(" +
-            ESCAPED_CHAR +
-            "|[^'\\x00])*'" +
-            "|" +
-            "\\((" +
-            ESCAPED_CHAR +
-            "|[^()\\x00])*\\))"
+        ESCAPED_CHAR +
+        '|\\\\[^\\\\]' +
+        '|[^\\\\"\\x00])*"' +
+        "|" +
+        "'(" +
+        ESCAPED_CHAR +
+        '|\\\\[^\\\\]' +
+        "|[^\\\\'\\x00])*'" +
+        "|" +
+        "\\((" +
+        ESCAPED_CHAR +
+        '|\\\\[^\\\\]' +
+        "|[^\\\\()\\x00])*\\))"
     );
 
     var reLinkDestinationBraces = /^(?:<(?:[^<>\n\\\x00]|\\.)*>)/;
@@ -12761,7 +12761,7 @@
     // Matches a string of non-special characters.
     var reMain = XRegExp.cache('^[\\s\\S]+?(?=[\\n`\\[\\]\\\\!<&*_\'"@:;xX~#$]|[a-z][a-z0-9.+-]{1,31}:|www\\d{0,3}\\.|[' + emailValidCharacters + ".]{1,64}@|$)");
 
-    var text = function(s) {
+    var text = function (s) {
         var node = new Node("text");
         node._literal = s;
         return node;
@@ -12770,7 +12770,7 @@
     // normalize a reference in reference link (remove []s, trim,
     // collapse internal space, unicode case fold.
     // See commonmark/commonmark.js#168.
-    var normalizeReference = function(string) {
+    var normalizeReference = function (string) {
         return string
             .slice(1, string.length - 1)
             .trim()
@@ -12787,7 +12787,7 @@
 
     // If re matches at current position in the subject, advance
     // position in subject and return the match; otherwise return null.
-    var match = function(re) {
+    var match = function (re) {
         var m = this.matchRegex(re);
         if (m === null) {
             return null;
@@ -12796,7 +12796,7 @@
         }
     };
 
-    var matchRegex = function(re) {
+    var matchRegex = function (re) {
         var m = re.exec(this.subject.slice(this.pos));
         if (m === null) {
             return null;
@@ -12806,7 +12806,7 @@
         }
     };
 
-    var tryMatch = function(re) {
+    var tryMatch = function (re) {
         var m = re.exec(this.subject.slice(this.pos));
         if (m === null) {
             return null;
@@ -12815,22 +12815,23 @@
         }
     };
 
-    var acceptMatch = function(m) {
+    var acceptMatch = function (m) {
         this.pos += m.index + m[0].length;
     };
 
     // Returns the code for the character at the current subject position, or -1
     // there are no more characters.
-    var peek = function() {
+    // This function must be non-BMP aware because the Unicode category of its result is used.
+    var peek = function () {
         if (this.pos < this.subject.length) {
-            return this.subject.charCodeAt(this.pos);
+            return this.subject.codePointAt(this.pos);
         } else {
             return -1;
         }
     };
 
     // Parse zero or more space characters, including at most one newline
-    var spnl = function() {
+    var spnl = function () {
         this.match(reSpnl);
         return true;
     };
@@ -12841,7 +12842,7 @@
 
     // Attempt to parse backticks, adding either a backtick code span or a
     // literal sequence of backticks.
-    var parseBackticks = function(block) {
+    var parseBackticks = function (block) {
         var ticks = this.match(reTicksHere);
         if (ticks === null) {
             return false;
@@ -12885,7 +12886,7 @@
     // character, a hard line break (if the backslash is followed by a newline),
     // or a literal backslash to the block's children.  Assumes current character
     // is a backslash.
-    var parseBackslash = function(block) {
+    var parseBackslash = function (block) {
         var subj = this.subject;
         var node;
         this.pos += 1;
@@ -12903,7 +12904,7 @@
     };
 
     // Attempt to parse an autolink (URL or email in pointy brackets).
-    var parseAutolink = function(block) {
+    var parseAutolink = function (block) {
         var m;
         var dest;
         var node;
@@ -12929,7 +12930,7 @@
     };
 
     // Attempt to parse a raw HTML tag.
-    var parseHtmlTag = function(block) {
+    var parseHtmlTag = function (block) {
         var m = this.match(reHtmlTag$1);
         if (m === null) {
             return false;
@@ -12945,7 +12946,7 @@
     // the number of delimiters and whether they are positioned such that
     // they can open and/or close emphasis or strong emphasis.  A utility
     // function for strong/emph parsing.
-    var scanDelims = function(cc) {
+    var scanDelims = function (cc) {
         var numdelims = 0;
         var char_before, char_after, cc_after;
         var startpos = this.pos;
@@ -12970,7 +12971,7 @@
             return null;
         }
 
-        char_before = startpos === 0 ? "\n" : this.subject.charAt(startpos - 1);
+        char_before = previousChar(this.subject, startpos);
 
         cc_after = this.peek();
         if (cc_after === -1) {
@@ -13003,11 +13004,30 @@
             can_close = right_flanking;
         }
         this.pos = startpos;
-        return { numdelims: numdelims, can_open: can_open, can_close: can_close };
+        return {numdelims: numdelims, can_open: can_open, can_close: can_close};
+
+        function previousChar(str, pos) {
+            if (pos === 0) {
+                return "\n";
+            }
+            var previous_cc = str.charCodeAt(pos - 1);
+            // not low surrogate (BMP)
+            if ((previous_cc & 0xfc00) !== 0xdc00) {
+                return str.charAt(pos - 1);
+            }
+            // returns NaN if out of range
+            var two_previous_cc = str.charCodeAt(pos - 2);
+            // NaN & 0xfc00 = 0
+            // checks if 2 previous char is high surrogate
+            if ((two_previous_cc & 0xfc00) !== 0xd800) {
+                return previous_char;
+            }
+            return str.slice(pos - 2, pos);
+        }
     };
 
     // Handle a delimiter marker for emphasis, quotes, or deleted text.
-    var handleDelim = function(cc, block) {
+    var handleDelim = function (cc, block) {
         var res = this.scanDelims(cc);
         if (!res) {
             return false;
@@ -13050,7 +13070,7 @@
         return true;
     };
 
-    var removeDelimiter = function(delim) {
+    var removeDelimiter = function (delim) {
         if (delim.previous !== null) {
             delim.previous.next = delim.next;
         }
@@ -13062,14 +13082,14 @@
         }
     };
 
-    var removeDelimitersBetween = function(bottom, top) {
+    var removeDelimitersBetween = function (bottom, top) {
         if (bottom.next !== top) {
             bottom.next = top;
             top.previous = bottom;
         }
     };
 
-    var processEmphasis = function(stack_bottom) {
+    var processEmphasis = function (stack_bottom) {
         var opener, closer, old_closer;
         var opener_inl, closer_inl;
         var tempstack;
@@ -13080,7 +13100,7 @@
         var openers_bottom_index;
         var odd_match = false;
 
-        for (var i = 0; i < 8; i++) {
+        for (var i = 0; i < 14; i++) {
             openers_bottom[i] = stack_bottom;
         }
         // find first closer above stack_bottom:
@@ -13098,19 +13118,20 @@
                 opener = closer.previous;
                 opener_found = false;
                 switch (closercc) {
-                   case C_SINGLEQUOTE:
-                     openers_bottom_index = 0;
-                     break;
-                   case C_DOUBLEQUOTE:
-                     openers_bottom_index = 1;
-                     break;
-                   case C_UNDERSCORE:
-                     openers_bottom_index = 2;
-                     break;
-                   case C_ASTERISK:
-                     openers_bottom_index = 3 + (closer.can_open ? 3 : 0)
-                                              + (closer.origdelims % 3);
-                     break;
+                    case C_SINGLEQUOTE:
+                        openers_bottom_index = 0;
+                        break;
+                    case C_DOUBLEQUOTE:
+                        openers_bottom_index = 1;
+                        break;
+                    case C_UNDERSCORE:
+                        openers_bottom_index = 2 + (closer.can_open ? 3 : 0)
+                            + (closer.origdelims % 3);
+                        break;
+                    case C_ASTERISK:
+                        openers_bottom_index = 8 + (closer.can_open ? 3 : 0)
+                            + (closer.origdelims % 3);
+                        break;
                 }
                 while (
                     opener !== null &&
@@ -13247,7 +13268,7 @@
         }
     };
 
-    var parseLinkSize = function() {
+    var parseLinkSize = function () {
         var size_matches = this.match(reLinkSize);
 
         if (size_matches === null) {
@@ -13272,7 +13293,7 @@
 
     // Attempt to parse link title (sans quotes), returning the string
     // or null if no match.
-    var parseLinkTitle = function() {
+    var parseLinkTitle = function () {
         var title = this.match(reLinkTitle);
         if (title === null) {
             return null;
@@ -13284,7 +13305,7 @@
 
     // Attempt to parse link destination, returning the string or
     // null if no match.
-    var parseLinkDestination = function() {
+    var parseLinkDestination = function () {
         var res = this.match(reLinkDestinationBraces);
         if (res === null) {
             if (this.peek() === C_LESSTHAN) {
@@ -13334,7 +13355,7 @@
     };
 
     // Attempt to parse a link label, returning number of characters parsed.
-    var parseLinkLabel = function() {
+    var parseLinkLabel = function () {
         var m = this.match(reLinkLabel);
         if (m === null || m.length > 1001) {
             return 0;
@@ -13344,7 +13365,7 @@
     };
 
     // Add open bracket to delimiter stack and add a text node to block's children.
-    var parseOpenBracket = function(block) {
+    var parseOpenBracket = function (block) {
         var startpos = this.pos;
         this.pos += 1;
 
@@ -13358,7 +13379,7 @@
 
     // IF next character is [, and ! delimiter to delimiter stack and
     // add a text node to block's children.  Otherwise just add a text node.
-    var parseBang = function(block) {
+    var parseBang = function (block) {
         var startpos = this.pos;
         this.pos += 1;
         if (this.peek() === C_OPEN_BRACKET) {
@@ -13379,7 +13400,7 @@
     // stack.  Add either a link or image, or a plain [ character,
     // to block's children.  If there is a matching delimiter,
     // remove it from the delimiter stack.
-    var parseCloseBracket = function(block) {
+    var parseCloseBracket = function (block) {
         var startpos;
         var is_image;
         var dest;
@@ -13509,7 +13530,7 @@
         }
     };
 
-    var addBracket = function(node, index, image) {
+    var addBracket = function (node, index, image) {
         if (this.brackets !== null) {
             this.brackets.bracketAfter = true;
         }
@@ -13523,15 +13544,15 @@
         };
     };
 
-    var removeBracket = function() {
+    var removeBracket = function () {
         this.brackets = this.brackets.previous;
     };
 
     // Attempt to parse an entity.
-    var parseEntity = function(block) {
+    var parseEntity = function (block) {
         var m;
         if ((m = this.match(reEntityHere))) {
-            block.appendChild(text(lib_7(m)));
+            block.appendChild(text(lib_6(m)));
             return true;
         } else {
             return false;
@@ -13540,7 +13561,7 @@
 
     // Attempt to parse a url
     var reUrl = XRegExp.cache('^(?:[A-Za-z][A-Za-z\\d-.+]*:(?:\\/{1,3}|[\\pL\\d%])|www\\d{0,3}[.]|[\\pL\\d.\\-]+[.]\\pL{2,4}\\/)(?:\\[[\\da-f:]+\\]|[^\\s`!()\\[\\]{;:\'",<>?«»“”‘’*_]|[*_]+(?=[^_*\\s])|[`!\\[\\]{;:\'",<>?«»“”‘’](?=[^\\s()<>])|\\((?:[^\\s()<>]|(?:\\([^\\s()<>]+\\)))*\\))+', 'i');
-    var parseUrl = function(block) {
+    var parseUrl = function (block) {
         if (this.brackets) {
             // Don't perform autolinking while inside an explicit link
             return false;
@@ -13607,7 +13628,7 @@
 
     // Attempt to parse a channel link
     var reChannelLink = /^~([a-z0-9_-]+)/i;
-    var parseChannelLink = function(block) {
+    var parseChannelLink = function (block) {
         if (this.brackets) {
             // Don't perform autolinking while inside an explicit link
             return false;
@@ -13634,7 +13655,7 @@
 
     // Attempt to parse a named emoji
     var reEmoji = /^:([a-z0-9_\-+]+):\B/i;
-    var parseEmoji = function(block) {
+    var parseEmoji = function (block) {
         var m;
         if ((m = this.tryMatch(reEmoji))) {
             // Only allow emojis after non-word characters
@@ -13677,7 +13698,7 @@
         "heart",
         "broken_heart"
     ];
-    var parseEmoticon = function(block) {
+    var parseEmoticon = function (block) {
         var m;
         if ((m = this.tryMatch(reEmoticon))) {
             // Only allow emoticons after whitespace or a delimiter
@@ -13705,7 +13726,7 @@
     };
 
     var reEmail = XRegExp.cache("^" + emailStartPattern + "[\\pL\\d.\\-]+[.]\\pL{2,4}(?=$|[^\\p{L}])");
-    var parseEmail = function(block) {
+    var parseEmail = function (block) {
         if (this.brackets) {
             // Don't perform autolinking while inside an explicit link
             return false;
@@ -13735,7 +13756,7 @@
     };
 
     var reHashtag = XRegExp.cache("^#(\\pL[\\pL\\d\\-_.]*[\\pL\\d])");
-    var parseHashtag = function(block) {
+    var parseHashtag = function (block) {
         if (this.brackets) {
             // Don't perform autolinking while inside an explicit link
             return false;
@@ -13764,7 +13785,7 @@
     };
 
     var reInlineLatex = /^\$([^\$\n]+)\$(?!\w)/;
-    var parseInlineLatex = function(block) {
+    var parseInlineLatex = function (block) {
 
         if (this.brackets) {
             // Don't perform autolinking while inside an explicit link
@@ -13796,7 +13817,7 @@
 
     // Parse a run of ordinary characters, or a single character with
     // a special meaning in markdown, as a plain string.
-    var parseString = function(block) {
+    var parseString = function (block) {
         var m;
         if ((m = this.match(reMain))) {
             if (this.options.smart) {
@@ -13804,7 +13825,7 @@
                     text(
                         m
                             .replace(reEllipses, "\u2026")
-                            .replace(reDash, function(chars) {
+                            .replace(reDash, function (chars) {
                                 var enCount = 0;
                                 var emCount = 0;
                                 if (chars.length % 3 === 0) {
@@ -13840,7 +13861,7 @@
 
     // Parse a newline.  If it was preceded by two spaces, return a hard
     // line break; otherwise a soft line break.
-    var parseNewline = function(block) {
+    var parseNewline = function (block) {
         this.pos += 1; // assume we're at a \n
         // check previous node for trailing spaces
         var lastc = block._lastChild;
@@ -13860,7 +13881,7 @@
     };
 
     // Attempt to parse a link reference, modifying refmap.
-    var parseReference = function(s, refmap) {
+    var parseReference = function (s, refmap) {
         this.subject = s;
         this.pos = 0;
         var rawlabel;
@@ -13900,7 +13921,6 @@
             title = this.parseLinkTitle();
         }
         if (title === null) {
-            title = "";
             // rewind before spaces
             this.pos = beforetitle;
         }
@@ -13908,13 +13928,13 @@
         // make sure we're at line end:
         var atLineEnd = true;
         if (this.match(reSpaceAtEndOfLine) === null) {
-            if (title === "") {
+            if (title === null) {
                 atLineEnd = false;
             } else {
                 // the potential title we found is not at the line end,
                 // but it could still be a legal link reference if we
                 // discard the title
-                title = "";
+                title = null;
                 // rewind before spaces
                 this.pos = beforetitle;
                 // and instead check if the link URL is at the line end
@@ -13935,7 +13955,7 @@
         }
 
         if (!refmap[normlabel]) {
-            refmap[normlabel] = { destination: dest, title: title };
+            refmap[normlabel] = {destination: dest, title: title === null ? "" : title};
         }
         return this.pos - startpos;
     };
@@ -13943,7 +13963,7 @@
     // Parse the next inline element in subject, advancing subject position.
     // On success, add the result to block's children and return true.
     // On failure, return false.
-    var parseInline = function(block) {
+    var parseInline = function (block) {
         var res = false;
         var c = this.peek();
         if (c === -1) {
@@ -14024,14 +14044,39 @@
 
     // Parse string content in block into inline children,
     // using refmap to resolve references.
-    var parseInlines = function(block) {
-        this.subject = block._string_content.trim();
+    var parseInlines = function (block) {
+        // String.protoype.trim() removes non-ASCII whitespaces, vertical tab, form feed and so on.
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim#return_value
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#white_space
+        // Removes only ASCII tab and space.
+        this.subject = trim(block._string_content);
         this.pos = 0;
         this.delimiters = null;
         this.brackets = null;
-        while (this.parseInline(block)) {}
+        while (this.parseInline(block)) { }
         block._string_content = null; // allow raw string to be garbage collected
         this.processEmphasis(null);
+
+        function trim(str) {
+            var start = 0;
+            for (; start < str.length; start++) {
+                if (!isSpace(str.charCodeAt(start))) {
+                    break;
+                }
+            }
+            var end = str.length - 1;
+            for (; end >= start; end--) {
+                if (!isSpace(str.charCodeAt(end))) {
+                    break;
+                }
+            }
+            return str.slice(start, end + 1);
+
+            function isSpace(c) {
+                // U+0020 = space, U+0009 = tab, U+000A = LF, U+000D = CR
+                return c === 0x20 || c === 9 || c === 0xa || c === 0xd;
+            }
+        }
     };
 
     // The InlineParser object.
@@ -14097,9 +14142,9 @@
         /^<(?:script|pre|textarea|style)(?:\s|>|$)/i,
         /^<!--/,
         /^<[?]/,
-        /^<![A-Z]/,
+        /^<![A-Za-z]/,
         /^<!\[CDATA\[/,
-        /^<[/]?(?:address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[123456]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|section|source|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)(?:\s|[/]?[>]|$)/i,
+        /^<[/]?(?:address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[123456]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|section|search|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)(?:\s|[/]?[>]|$)/i,
         new RegExp("^(?:" + OPENTAG + "|" + CLOSETAG + ")\\s*$", "i")
     ];
 
@@ -14128,17 +14173,11 @@
 
     var reCodeFence = /^`{3,}(?!.*`)|^~{3,}/;
 
-    var reClosingCodeFence = /^(?:`{3,}|~{3,})(?= *$)/;
+    var reClosingCodeFence = /^(?:`{3,}|~{3,})(?=[ \t]*$)/;
 
     var reSetextHeadingLine = /^(?:=+|-+)[ \t]*$/;
 
     var reLineEnding = /\r\n|\n|\r/;
-
-    var reTableDelimiter = /^[ \t]{0,3}((?:\|[ \t]*)?:?-+:?[ \t]*(?:\|(?:[ \t]*:?-+:?[ \t]*)?)*\|?)$/;
-
-    var reTableRow = /^(\|?)(?:(?:\\\||[^|])*\|?)+$/;
-
-    var reTablePipeSpaceEnding = /\|\s+$/;
 
     var MAX_AUTOCOMPLETED_CELLS = 1000;
 
@@ -14159,31 +14198,14 @@
         }
     };
 
-    var trimSpacesAfterPipe = function(ln) {
-        return ln.replace(reTablePipeSpaceEnding,"|");
-    };
-
     // DOC PARSER
 
     // These are methods of a Parser object, defined below.
 
-    // Returns true if block ends with a blank line, descending if needed
-    // into lists and sublists.
+    // Returns true if block ends with a blank line.
     var endsWithBlankLine = function(block) {
-        while (block) {
-            if (block._lastLineBlank) {
-                return true;
-            }
-            var t = block.type;
-            if (!block._lastLineChecked && (t === "list" || t === "item")) {
-                block._lastLineChecked = true;
-                block = block._lastChild;
-            } else {
-                block._lastLineChecked = true;
-                break;
-            }
-        }
-        return false;
+        return block.next &&
+            block.sourcepos[1][0] !== block.next.sourcepos[0][0] - 1;
     };
 
     // Add a line to the block at the tip.  We assume the tip
@@ -14196,6 +14218,18 @@
             this.tip._string_content += " ".repeat(charsToTab);
         }
         this.tip._string_content += this.currentLine.slice(this.offset) + "\n";
+    };
+
+    // Change the tip to be of type tag as long as the parent can
+    // contain a block of that type.  Returns whether or not the
+    // type could be changed.
+    var changeTipType = function(tag) {
+        const validChild = this.blocks[this.tip.parent.type].canContain(tag);
+        if (validChild) {
+            this.tip._type = tag;
+        }
+
+        return validChild;
     };
 
     // Add block of type tag as a child of the tip.  If the tip can't
@@ -14314,6 +14348,50 @@
         }
     };
 
+    // Remove link reference definitions from given tree.
+    var removeLinkReferenceDefinitions = function(parser, tree) {
+        var event, node;
+        var walker = tree.walker();
+        var emptyNodes = [];
+
+        while ((event = walker.next())) {
+            node = event.node;
+            if (event.entering && node.type === "paragraph") {
+                var pos;
+                var hasReferenceDefs = false;
+
+                // Try parsing the beginning as link reference definitions;
+                // Note that link reference definitions must be the beginning of a
+                // paragraph node since link reference definitions cannot interrupt
+                // paragraphs.
+                while (
+                    peek$1(node._string_content, 0) === C_OPEN_BRACKET$1 &&
+                        (pos = parser.inlineParser.parseReference(
+                            node._string_content,
+                            parser.refmap
+                        ))
+                ) {
+                    const removedText = node._string_content.slice(0, pos);
+
+                    node._string_content = node._string_content.slice(pos);
+                    hasReferenceDefs = true;
+
+                    const lines = removedText.split("\n");
+
+                    // -1 for final newline.
+                    node.sourcepos[0][0] += lines.length - 1;
+                }
+                if (hasReferenceDefs && isBlank(node._string_content)) {
+                    emptyNodes.push(node);
+                }
+            }
+        }
+
+        for (node of emptyNodes) {
+            node.unlink();
+        }
+    };
+
     // 'finalize' is run when the block is closed.
     // 'continue' is run to check whether the block is continuing
     // at a certain line and offset (e.g. whether a block quote
@@ -14324,7 +14402,8 @@
             continue: function() {
                 return 0;
             },
-            finalize: function() {
+            finalize: function(parser, block) {
+                removeLinkReferenceDefinitions(parser, block);
                 return;
             },
             canContain: function(t) {
@@ -14340,7 +14419,7 @@
                 var item = block._firstChild;
                 while (item) {
                     // check for non-final list item ending with blank line:
-                    if (endsWithBlankLine(item) && item._next) {
+                    if (item._next && endsWithBlankLine(item)) {
                         block._listData.tight = false;
                         break;
                     }
@@ -14349,8 +14428,8 @@
                     var subitem = item._firstChild;
                     while (subitem) {
                         if (
-                            endsWithBlankLine(subitem) &&
-                            (item._next || subitem._next)
+                            subitem._next &&
+                            endsWithBlankLine(subitem)
                         ) {
                             block._listData.tight = false;
                             break;
@@ -14359,6 +14438,7 @@
                     }
                     item = item._next;
                 }
+                block.sourcepos[1] = block._lastChild.sourcepos[1];
             },
             canContain: function(t) {
                 return t === "item";
@@ -14413,7 +14493,16 @@
                 }
                 return 0;
             },
-            finalize: function() {
+            finalize: function(parser, block) {
+                if (block._lastChild) {
+                    block.sourcepos[1] = block._lastChild.sourcepos[1];
+                } else {
+                    // Empty list item
+                    block.sourcepos[1][0] = block.sourcepos[0][0];
+                    block.sourcepos[1][1] =
+                        block._listData.markerOffset + block._listData.padding;
+                }
+
                 return;
             },
             canContain: function(t) {
@@ -14495,10 +14584,17 @@
                     block._literal = rest;
                 } else {
                     // indented
-                    block._literal = block._string_content.replace(
-                        /(\n *)+$/,
-                        "\n"
-                    );
+                    var lines = block._string_content.split("\n");
+                    // Note that indented code block cannot be empty, so
+                    // lines.length cannot be zero.
+                    while (/^[ \t]*$/.test(lines[lines.length - 1])) {
+                        lines.pop();
+                    }
+                    block._literal = lines.join("\n") + "\n";
+                    block.sourcepos[1][0] =
+                        block.sourcepos[0][0] + lines.length - 1;
+                    block.sourcepos[1][1] =
+                        block.sourcepos[0][1] + lines[lines.length - 1].length - 1;
                 }
                 block._string_content = null; // allow GC
             },
@@ -14516,7 +14612,7 @@
                     : 0;
             },
             finalize: function(parser, block) {
-                block._literal = block._string_content.replace(/(\n *)+$/, "");
+                block._literal = block._string_content.replace(/\n$/, '');
                 block._string_content = null; // allow GC
             },
             canContain: function() {
@@ -14544,9 +14640,6 @@
                 for (var row = block.firstChild; row; row = row.next) {
                     var i = 0;
                     for (var cell = row.firstChild; cell; cell = cell.next) {
-                        // copy column alignment to each cell
-                        cell.align = block.alignColumns[i];
-
                         i += 1;
 
                         // if there's more columns in a row than the header row, GitHub cuts them off
@@ -14586,15 +14679,8 @@
 
                 return 1;
             },
-            finalize: function(parser, block) {
-                // mark the header row since it'll have special treatment when rendering
-                if (block === block.parent.firstChild) {
-                    block.isHeading = true;
-
-                    for (var cell = block.firstChild; cell; cell = cell.next) {
-                        cell.isHeading = true;
-                    }
-                }
+            finalize: function() {
+                return;
             },
             canContain: function(t) { return (t === "table_cell"); },
             acceptsLines: false
@@ -14613,24 +14699,8 @@
             continue: function(parser) {
                 return parser.blank ? 1 : 0;
             },
-            finalize: function(parser, block) {
-                var pos;
-                var hasReferenceDefs = false;
-
-                // try parsing the beginning as link reference definitions:
-                while (
-                    peek$1(block._string_content, 0) === C_OPEN_BRACKET$1 &&
-                    (pos = parser.inlineParser.parseReference(
-                        block._string_content,
-                        parser.refmap
-                    ))
-                ) {
-                    block._string_content = block._string_content.slice(pos);
-                    hasReferenceDefs = true;
-                }
-                if (hasReferenceDefs && isBlank(block._string_content)) {
-                    block.unlink();
-                }
+            finalize: function() {
+                return;
             },
             canContain: function() {
                 return false;
@@ -14853,50 +14923,104 @@
 
         // table
         function(parser, container) {
-            if (container.type !== "document") {
+            // Because tables depend on two adjacent lines, the first line is read into a paragraph and then we might turn
+            // that paragraph into a table when we read the second line.
+
+            if (parser.indented || container.type !== "paragraph") {
                 return 0;
             }
 
-            if (parser.indented) {
+            if (container._tableVisited) {
                 return 0;
             }
 
-            if (!parser.nextLine) {
-                // tables require at least two rows (header and delimiter)
+            // At this point, we're on the second line of the paragraph, so we can check to see the two lines we've read
+            // are the header row and delimiter row of the table
+
+            // Check for a delimiter first since it's stricter than the header row.
+            const delimiterCells = parseTableRow(parser.currentLine, parser.nextNonspace);
+            if (!delimiterCells || !validateDelimiterRow(delimiterCells)) {
+                // The second line of the paragraph isn't a table row, so this paragraph isn't actually a table
                 return 0;
             }
 
-            // check for a delimiter first since it's stricter than the header row
-            const nextLine = trimSpacesAfterPipe(parser.nextLine);
-            var delimiterMatch = reTableDelimiter.exec(nextLine);
-            if (!delimiterMatch || delimiterMatch[0].indexOf("|") === -1) {
+            // container._string_content contains everything in the paragraph so far including a trailing newline, but
+            // we only want to check the last line of it for the header row
+            const lastLineMatch = matchLastLine(container._string_content);
+            const lastLine = lastLineMatch[1];
+
+            const headerCells = parseTableRow(lastLine, 0);
+            if (!headerCells) {
+                // The first line isn't a header row, so this isn't a table
                 return 0;
             }
-
-            const currentLine = trimSpacesAfterPipe(parser.currentLine);
-            var headerMatch = reTableRow.exec(currentLine.slice(parser.nextNonspace));
-            if (!headerMatch) {
-                return 0;
-            }
-
-            var delimiterCells = parseTableCells(delimiterMatch[1]);
-            var headerCells = parseTableCells(headerMatch[0]);
 
             if (delimiterCells.length !== headerCells.length) {
-                // the first two rows must be the same length for this to be considered a table
+                // The first two rows must be the same length for this to be considered a table
+
+                // Track that we've already identified that this paragraph isn't a table, so that we don't check the same
+                // paragraph again
+                container._tableVisited = true;
                 return 0;
             }
 
-            parser.closeUnmatchedBlocks();
+            // Turn this paragraph into a table if possible
+            if (!parser.changeTipType("table")) {
+                return 0;
+            }
 
-            parser.advanceNextNonspace();
-            parser.addChild("table", parser.offset);
+            // If there's any text before lastLine, then there's text before the table that we need to re-add as a
+            // paragraph before the table
+            if (lastLineMatch.index > 0) {
+                // Create the new paragraph node based on where we found the header row
+                const textBeforeTable = parser.tip._string_content.substring(0, lastLineMatch.index);
+                const lastLineBeforeTable = matchLastLine(textBeforeTable);
 
-            // store the alignments of the columns and then skip the delimiter line since we've
+                const newParagraph = new Node("paragraph", [
+                    parser.tip.sourcepos[0],
+                    [parser.lineNumber - 2, lastLineBeforeTable.length],
+                ]);
+                newParagraph._string_content = textBeforeTable;
+
+                // Update the parser.tip which is now the table with its new position
+                parser.tip._string_content = parser.tip._string_content.substring(lastLineMatch.index);
+                parser.tip._sourcepos[0] = [parser.lineNumber - 1, 0];
+
+                // Add the paragraph before the table
+                parser.tip.insertBefore(newParagraph);
+            }
+
+            // Store the alignments of the columns and then skip the delimiter line since we've
             // gotten what we need from it
             parser.tip.alignColumns = delimiterCells.map(getCellAlignment);
 
-            parser.skipNextLine();
+            const headerRow = new Node("table_row", [
+                [parser.lineNumber - 1, parser.offset + 1],
+                [parser.lineNumber - 1, parser.offset + lastLine.length],
+            ]);
+            headerRow._string_content = container._string_content.substring(0, lastLine.length);
+            headerRow._isHeading = true;
+
+            for (let i = 0; i < headerCells.length; i++) {
+                const cell = new Node("table_cell", [
+                    [parser.lineNumber - 1, headerCells[i].start],
+                    [parser.lineNumber - 1, headerCells[i].end],
+                ]);
+
+                cell._string_content = headerCells[i].contents;
+                cell._align = parser.tip.alignColumns[i];
+                cell._isHeading = true;
+
+                headerRow.appendChild(cell);
+            }
+
+            parser.tip.appendChild(headerRow);
+
+            // Mark the rest of the line as read
+            parser.advanceOffset(
+                parser.currentLine.length - parser.offset,
+                false
+            );
 
             return 1;
         },
@@ -14911,59 +15035,171 @@
                 return 2;
             }
 
-            var rowMatch = reTableRow.exec(parser.currentLine.slice(parser.nextNonspace));
-            if (!rowMatch) {
+            const cells = parseTableRow(parser.currentLine, parser.nextNonspace);
+            if (!cells) {
                 return 0;
             }
 
             parser.closeUnmatchedBlocks();
-            parser.advanceNextNonspace();
+            parser.addChild("table_row", parser.nextNonspace);
 
-            parser.addChild("table_row", parser.offset);
+            for (let i = 0; i < cells.length; i++) {
+                const cell = new Node("table_cell", [
+                    [parser.lineNumber, cells[i].start],
+                    [parser.lineNumber, cells[i].end],
+                ]);
 
-            // advance past leading | if one exists
-            parser.advanceOffset(rowMatch[1].length, false);
+                cell._string_content = cells[i].contents;
+                cell._align = parser.tip.parent.alignColumns[i];
 
-            // parse the row into cells
-            var cells = parseTableCells(rowMatch[0]);
-            var length = cells.length;
-            for (var i = 0; i < length; i++) {
-                parser.addChild("table_cell", parser.offset);
-
-                parser.tip._string_content = cells[i].trim();
-
-                parser.advanceOffset(cells[i].length + 1);
+                parser.tip.appendChild(cell);
             }
+
+            // Mark the rest of the line as read
+            parser.advanceOffset(
+                parser.currentLine.length - parser.offset,
+                false
+            );
 
             return 2;
         }
     ];
 
-    var parseTableCells = function(row) {
-        // remove starting pipe to make life easier
-        row = row.replace(/^\|/, "");
+    const parseTableRow = function(line, startAt) {
+        // This is attempting to replicate row_from_string from GitHub's Commonmark fork. That function can be found here:
+        // https://github.com/github/cmark-gfm/blob/587a12bb54d95ac37241377e6ddc93ea0e45439b/extensions/table.c#L189
 
-        var reTableCell = /\||((?:\\\||[^|])+)\|?/g;
+        let cells = [];
 
-        var match;
-        var cells = [];
-        while (match = reTableCell.exec(row)) {
-            cells.push(match[1] || "");
+        let expectMoreCells = true;
+
+        // Start at the current parser position
+        let offset = startAt;
+
+        // Read past the optional leading pipe
+        offset += scanTableCellEnd(line, offset);
+
+        while (offset < line.length && expectMoreCells) {
+            const cellLength = scanTableCell(line, offset);
+            const pipeLength = scanTableCellEnd(line, offset + cellLength);
+
+            if (cellLength > 0 || pipeLength > 0) {
+                // We're guaranteed to have found a cell because we either found some cell content (cellLength > 0) or
+                // we found an empty cell with a pipe (cellLength == 0 && pipeLength > 0)
+                const cellContents = unescapePipes(line.substring(offset, offset + cellLength));
+
+                cells.push({
+                    contents: cellContents,
+                    start: offset,
+                    end: offset + cellLength,
+                });
+
+                offset += cellLength + pipeLength;
+            }
+
+            if (pipeLength > 0) {
+                expectMoreCells = true;
+            } else {
+                // We've read the last cell, so check if we've reached the end of the row
+                const rowEndLength = scanTableRowEnd(line, offset);
+
+                // Unlike cmark-gfm, we don't need to try again on the next line because we only call this function with
+                // one line at a time
+
+                if (rowEndLength === -1) ; else {
+                    offset += rowEndLength;
+                }
+
+                expectMoreCells = false;
+            }
         }
 
-        return cells;
+        if (offset === line.length) {
+            // We've read the whole line, so it's a valid row
+            return cells;
+        } else {
+            // There's unhandled text here, so it's not actually a table row
+            return null;
+        }
+    };
+
+    const reTableCell = new RegExp("^([\\\\]" + ESCAPABLE + "|[^|\r\n])+");
+    const scanTableCell = function(line, offset) {
+        // Reads up until a newline or an unescaped pipe and return the number of characters read
+        const match = reTableCell.exec(line.substring(offset));
+        if (match) {
+            return match[0].length;
+        } else {
+            // If this doesn't match, it may still be valid because there's an empty table cell or we're at the end of the line
+            return 0;
+        }
+    };
+
+    const scanTableCellEnd = function(line, offset) {
+        // Read an optional pipe followed by some amount of optional whitespace and return the number of characters read
+        let i = 0;
+
+        if (line.charAt(offset + i) === "|") {
+            i += 1;
+        }
+
+        let c = line.charAt(offset + i);
+        while (c === " " || c === "\t" || c === "\v" || c === "\f") {
+            i += 1;
+            c = line.charAt(offset + i);
+        }
+
+        return i;
+    };
+
+    const scanTableRowEnd = function(line, offset) {
+        // Read any amount of optional whitespace and then ensure that we're at the end of the string
+        let i = 0;
+
+        let c = line.charAt(offset + i);
+        while (c === " " || c === "\t" || c === "\v" || c === "\f") {
+            i += 1;
+            c = line.charAt(offset + i);
+        }
+
+        if (offset + i === line.length) {
+            // This is the end of the row
+            return i;
+        } else {
+            // There's still more after this which means this isn't actually a table row
+            return -1;
+        }
+    };
+
+    const reValidTableDelimiter = /^[ \t]*:?-+:?[ \t]*$/;
+    const validateDelimiterRow = function(cells) {
+        for (const cell of cells) {
+            if (!reValidTableDelimiter.test(cell.contents)) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    const unescapePipes = function(str) {
+        return str.replace("\\|", "|");
+    };
+
+    const matchLastLine = function(str) {
+        return (/([^\n]*)\n$/).exec(str);
     };
 
     var getCellAlignment = function(cell) {
-        cell = cell.trim();
+        const cellContents = cell.contents.trim();
 
-        if (cell.charAt(0) === ":") {
-            if (cell.charAt(cell.length - 1) === ":") {
+        if (cellContents.charAt(0) === ":") {
+            if (cellContents.charAt(cellContents.length - 1) === ":") {
                 return "center";
             } else {
                 return "left";
             }
-        } else if (cell.endsWith(":")) {
+        } else if (cellContents.endsWith(":")) {
             return "right";
         } else {
             return "";
@@ -15031,7 +15267,7 @@
     // Analyze a line of text and update the document appropriately.
     // We parse markdown text by calling this on each line of input,
     // then finalizing the document.
-    var incorporateLine = function(ln, nextLn) {
+    var incorporateLine = function(ln) {
         var all_matched = true;
         var t;
 
@@ -15049,7 +15285,6 @@
         }
 
         this.currentLine = ln;
-        this.nextLine = nextLn;
 
         // For each containing block, try to parse the associated line start.
         // Bail out on failure: container will point to the last matching block.
@@ -15094,7 +15329,7 @@
                 !this.indented && // starts indented code blocks
                 !reMaybeSpecial.test(ln.slice(this.nextNonspace)) && // starts lists, block quotes, etc
                 (container.type !== "table" && container.type !== "table_row") && // start table rows
-                (nextLn && !reMaybeDelimiterRow.test(nextLn.slice(this.nextNonspace))) // starts tables
+                !reMaybeDelimiterRow.test(ln.slice(this.nextNonspace)) // starts tables
             ) {
                 this.advanceNextNonspace();
                 break;
@@ -15138,32 +15373,8 @@
 
             // finalize any blocks not matched
             this.closeUnmatchedBlocks();
-            if (this.blank && container.lastChild) {
-                container.lastChild._lastLineBlank = true;
-            }
 
             t = container.type;
-
-            // Block quote lines are never blank as they start with >
-            // and we don't count blanks in fenced code for purposes of tight/loose
-            // lists or breaking out of lists.  We also don't set _lastLineBlank
-            // on an empty list item, or if we just closed a fenced block.
-            var lastLineBlank =
-                this.blank &&
-                !(
-                    t === "block_quote" ||
-                    (t === "code_block" && container._isFenced) ||
-                    (t === "item" &&
-                        !container._firstChild &&
-                        container.sourcepos[0][0] === this.lineNumber)
-                );
-
-            // propagate lastLineBlank up through parents:
-            var cont = container;
-            while (cont) {
-                cont._lastLineBlank = lastLineBlank;
-                cont = cont._parent;
-            }
 
             if (this.blocks[t].acceptsLines) {
                 this.addLine();
@@ -15187,10 +15398,6 @@
             }
         }
         this.lastLineLength = ln.length;
-    };
-
-    var skipNextLine = function() {
-        this.shouldSkipNextLine = true;
     };
 
     // Finalize a block.  Close it and do any necessary postprocessing,
@@ -15243,7 +15450,6 @@
         this.column = 0;
         this.lastMatchedContainer = this.doc;
         this.currentLine = "";
-        this.shouldSkipNextLine = false;
         if (this.options.time) {
             console.time("preparing input");
         }
@@ -15260,11 +15466,7 @@
             console.time("block parsing");
         }
         for (var i = 0; i < len; i++) {
-            if (this.shouldSkipNextLine) {
-                this.shouldSkipNextLine = false;
-                continue;
-            }
-            this.incorporateLine(lines[i], lines[i + 1]);
+            this.incorporateLine(lines[i]);
         }
         while (this.tip) {
             this.finalize(this.tip, len);
@@ -15316,8 +15518,8 @@
             advanceNextNonspace: advanceNextNonspace,
             addLine: addLine,
             addChild: addChild,
+            changeTipType: changeTipType,
             incorporateLine: incorporateLine,
-            skipNextLine: skipNextLine,
             finalize: finalize,
             processInlines: processInlines,
             closeUnmatchedBlocks: closeUnmatchedBlocks,
@@ -15593,7 +15795,11 @@
         var info_words = node.info ? node.info.split(/\s+/) : [],
             attrs = this.attrs(node);
         if (info_words.length > 0 && info_words[0].length > 0) {
-            attrs.push(["class", "language-" + this.esc(info_words[0])]);
+            var cls = this.esc(info_words[0]);
+            if (!/^language-/.exec(cls)) {
+              cls = "language-" + cls;
+            }
+            attrs.push(["class", cls]);
         }
         this.cr();
         this.tag("pre");
@@ -15683,12 +15889,15 @@
             this.cr();
         } else {
             this.tag("/tr");
+            this.cr();
 
             if (node === node.parent.firstChild) {
                 this.cr(); // we're not consistent about how these tags are laid out because this is what GitHub does
                 this.tag("/thead");
+                this.cr();
             } else if (node === node.parent.lastChild) {
                 this.tag("/tbody");
+                this.cr();
             }
         }
     }

@@ -184,6 +184,10 @@ specTests('test/tables.txt', results, function(z) {
         return writer.render(reader.parse(z));
 });
 
+specTests('test/gfm_extensions.txt', results, function(z) {
+        return writer.render(reader.parse(z));
+});
+
 // pathological cases
 cursor.write("Pathological cases:\n");
 
@@ -301,6 +305,14 @@ for (x = 1000; x <= 10000; x *= 10) {
         expected: "<p>" + "[" + repeat("\\", x / 2) + "</p>\n"
     });
 }
+for (x = 10; x <= 1000; x *= 10) {
+    cases.push({
+        name: x + " backslashes in unclosed link title",
+        input: "[test](\\url \"" + repeat("\\", x) + "\n",
+        expected: "<p>[test](\\url &quot;" + repeat("\\", x / 2) + "</p>\n"
+    });
+}
+
 // Commented out til we have a fix... see #129
 // for (x = 1000; x <= 10000; x *= 10) {
 //     cases.push(
